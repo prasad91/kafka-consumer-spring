@@ -25,7 +25,7 @@ public class KafkaConsumerConfig {
 	private String groupId;
 
 	@Bean
-	public ConsumerFactory<String, String> consumerFactory() {
+	public ConsumerFactory<String, String> consumerFactory(String groupId) {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -38,12 +38,12 @@ public class KafkaConsumerConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
 
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory());
+		factory.setConsumerFactory(consumerFactory(groupId));
 		return factory;
 	}
 
-	@KafkaListener(topics = "topicName", groupId = "foo")
+	@KafkaListener(topics = "${spring.kafka.consumer.topic-name}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
 	public void listen(String message) {
-		System.out.println("Received Messasge in group foo: " + message);
+		System.out.println("Received Messasge in group group1: " + message);
 	}
 }
